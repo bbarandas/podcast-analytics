@@ -1,0 +1,13 @@
+statsbombpy
+mplsoccer
+matplotlib
+plotly
+streamlit
+pandas
+numpy
+Pillow
+yt-dlp
+opencv-python
+mediapipe
+ultralytics
+pytest
