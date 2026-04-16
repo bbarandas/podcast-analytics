@@ -16,10 +16,10 @@ def download(url: str, output_dir: Path) -> Path:
     """
     output_dir.mkdir(parents=True, exist_ok=True)
     ydl_opts = {
-        "format": "mp4",
+        "format": "mp4/best",
         "outtmpl": str(output_dir / "%(title)s.%(ext)s"),
         "quiet": True,
-        "cookiesfrombrowser": ("chrome",),
+        "extractor_args": {"youtube": {"player_client": ["ios"]}},
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
