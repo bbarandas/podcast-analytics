@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
-import cv2
 import mediapipe as mp
 import numpy as np
 import pandas as pd
+from PIL import Image
 
 mp_pose = mp.solutions.pose
 mp_drawing = mp.solutions.drawing_utils
@@ -63,38 +63,22 @@ def _angle(a: list, b: list, c: list) -> float:
 
 
 def estimate_pose(frame_paths: List[Path]) -> List[PoseResult]:
-    """Run MediaPipe Pose on each frame.
-
-    Args:
-        frame_paths: List of JPEG frame paths.
-
-    Returns:
-        List of PoseResult objects (landmarks=None if detection failed).
-    """
+    """Run MediaPipe Pose on each frame."""
     results: List[PoseResult] = []
     with mp_pose.Pose(static_image_mode=True, min_detection_confidence=0.5) as pose:
         for fp in frame_paths:
-            img = cv2.imread(str(fp))
-            if img is None:
+            try:
+                img_rgb = np.array(Image.open(str(fp)).convert("RGB"))
+            except Exception:
                 results.append(PoseResult(frame_path=fp, landmarks=None))
                 continue
-            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             result = pose.process(img_rgb)
             results.append(PoseResult(frame_path=fp, landmarks=result.pose_landmarks))
     return results
 
 
 def calculate_angles(pose_results: List[PoseResult]) -> pd.DataFrame:
-    """Calculate joint angles for each frame.
-
-    Args:
-        pose_results: List of PoseResult from estimate_pose.
-
-    Returns:
-        DataFrame with columns: frame, joelho_dir, joelho_esq, quadril_dir,
-        quadril_esq, tornozelo_dir, tornozelo_esq.
-        NaN where landmarks were not detected.
-    """
+    """Calculate joint angles for each frame."""
     rows = []
     for pr in pose_results:
         row: dict = {"frame": pr.frame_path.name}
@@ -114,27 +98,18 @@ def overlay_skeleton(
     pose_results: List[PoseResult],
     output_dir: Path,
 ) -> List[Path]:
-    """Draw MediaPipe skeleton overlay on each frame.
-
-    Args:
-        frame_paths: Original frame paths.
-        pose_results: Pose results aligned with frame_paths.
-        output_dir: Directory to save annotated frames.
-
-    Returns:
-        List of paths to annotated frame JPEGs.
-    """
+    """Draw MediaPipe skeleton overlay on each frame."""
     output_dir.mkdir(parents=True, exist_ok=True)
     output_paths: List[Path] = []
 
     for fp, pr in zip(frame_paths, pose_results):
-        img = cv2.imread(str(fp))
-        if img is None:
+        try:
+            img_rgb = np.array(Image.open(str(fp)).convert("RGB"))
+        except Exception:
             continue
         if pr.landmarks:
-            mp_drawing.draw_landmarks(img, pr.landmarks, mp_pose.POSE_CONNECTIONS)
-        out_path = output_dir / fp.name
-        cv2.imwrite(str(out_path), img)
-        output_paths.append(out_path)
+            mp_drawing.draw_landmarks(img_rgb, pr.landmarks, mp_pose.POSE_CONNECTIONS)
+        Image.fromarray(img_rgb).save(str(output_dir / fp.name))
+        output_paths.append(output_dir / fp.name)
 
     return output_paths
