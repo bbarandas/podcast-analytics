@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from mplsoccer import Pitch
@@ -11,6 +10,8 @@ from visualizations.theme import (
 
 def _base_pitch() -> tuple:
     """Return (Pitch, fig, ax) with podcast theme applied."""
+    # pitch_color="grass" is intentional: green field on a dark navy figure background.
+    # PITCH_BG is applied to the figure face (outer area), not the pitch surface.
     pitch = Pitch(pitch_color="grass", line_color=LINE_COLOR, line_zorder=2)
     fig, ax = pitch.draw(figsize=(12, 8))
     fig.set_facecolor(PITCH_BG)
@@ -36,11 +37,18 @@ def pass_map(events: pd.DataFrame, player_name: str) -> Figure:
     ].dropna(subset=["location", "pass_end_location"])
 
     pitch, fig, ax = _base_pitch()
-    for _, row in passes.iterrows():
-        x, y = row["location"]
-        ex, ey = row["pass_end_location"]
-        color = ACCENT_GREEN if pd.isna(row.get("pass_outcome")) else ACCENT_RED
-        pitch.arrows(x, y, ex, ey, ax=ax, color=color, width=1.5, headwidth=5, zorder=2)
+
+    # Split into successful (NaN outcome) and failed passes
+    successful = passes[pd.isna(passes["pass_outcome"])]
+    failed = passes[~pd.isna(passes["pass_outcome"])]
+
+    for group, color in [(successful, ACCENT_GREEN), (failed, ACCENT_RED)]:
+        if len(group) > 0:
+            xs = [loc[0] for loc in group["location"]]
+            ys = [loc[1] for loc in group["location"]]
+            exs = [loc[0] for loc in group["pass_end_location"]]
+            eys = [loc[1] for loc in group["pass_end_location"]]
+            pitch.arrows(xs, ys, exs, eys, ax=ax, color=color, width=1.5, headwidth=5, zorder=2)
 
     ax.set_title(f"Mapa de Passes — {player_name}", fontsize=FONT_SIZE_TITLE, color=TEXT_COLOR)
     return fig

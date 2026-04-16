@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib
 matplotlib.use("Agg")  # headless rendering for tests
 from matplotlib.figure import Figure
