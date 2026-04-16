@@ -19,6 +19,7 @@ def download(url: str, output_dir: Path) -> Path:
         "format": "mp4",
         "outtmpl": str(output_dir / "%(title)s.%(ext)s"),
         "quiet": True,
+        "cookiesfrombrowser": ("safari",),
     }
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
