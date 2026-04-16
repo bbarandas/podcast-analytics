@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 import pandas as pd
 import pytest
 from modules.data_sources.statsbomb import list_competitions, list_matches, get_events, get_360
