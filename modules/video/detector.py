@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import List
 from PIL import Image, ImageDraw
 import numpy as np
-from ultralytics import YOLO
 
 
 @dataclass
@@ -15,6 +14,10 @@ class Detection:
 
 def detect_players(frames_dir: Path, model_name: str = "yolov8n.pt") -> List[Detection]:
     """Run YOLO person detection on all JPEGs in frames_dir."""
+    try:
+        from ultralytics import YOLO
+    except ImportError:
+        raise RuntimeError("ultralytics não está instalado neste ambiente.")
     model = YOLO(model_name)
     frame_paths = sorted(frames_dir.glob("*.jpg"))
     detections: List[Detection] = []

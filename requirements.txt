@@ -9,4 +9,3 @@ Pillow
 yt-dlp
 opencv-python-headless
 mediapipe
-ultralytics

@@ -51,15 +51,18 @@ if st.button("Extrair frames e detectar jogadores"):
     with st.spinner("Extraindo frames..."):
         frames_dir = PROJECT_ROOT / "data" / "frames" / video_path.stem
         frames = extract_frames(video_path, start_sec, end_sec, frames_dir)
+        st.session_state["frames"] = [str(p) for p in frames]
         st.success(f"{len(frames)} frames extraídos.")
 
-    with st.spinner("Detectando jogadores (YOLO)..."):
-        detections = detect_players(frames_dir)
-        annotated_dir = PROJECT_ROOT / "data" / "annotated" / video_path.stem
-        annotated = annotate_frames(detections, annotated_dir)
-        st.session_state["frames"] = [str(p) for p in frames]
-        st.session_state["annotated"] = [str(p) for p in annotated]
-        st.success("Detecção concluída.")
+    try:
+        with st.spinner("Detectando jogadores (YOLO)..."):
+            detections = detect_players(frames_dir)
+            annotated_dir = PROJECT_ROOT / "data" / "annotated" / video_path.stem
+            annotated = annotate_frames(detections, annotated_dir)
+            st.session_state["annotated"] = [str(p) for p in annotated]
+            st.success("Detecção concluída.")
+    except RuntimeError:
+        st.info("Detecção de jogadores (YOLO) não disponível neste ambiente. Vá para **Biomecânica** para analisar os ângulos articulares.")
 
 if "annotated" in st.session_state:
     st.subheader("Frames anotados")
