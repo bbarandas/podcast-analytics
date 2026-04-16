@@ -1,7 +1,7 @@
-import subprocess
 from pathlib import Path
 from typing import List
 import cv2
+from yt_dlp import YoutubeDL
 
 
 def download(url: str, output_dir: Path) -> Path:
@@ -15,11 +15,13 @@ def download(url: str, output_dir: Path) -> Path:
         Path to the downloaded MP4 file.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
-    output_template = str(output_dir / "%(title)s.%(ext)s")
-    subprocess.run(
-        ["yt-dlp", "-o", output_template, "--format", "mp4", url],
-        check=True,
-    )
+    ydl_opts = {
+        "format": "mp4",
+        "outtmpl": str(output_dir / "%(title)s.%(ext)s"),
+        "quiet": True,
+    }
+    with YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
     mp4_files = sorted(output_dir.glob("*.mp4"), key=lambda p: p.stat().st_mtime)
     if not mp4_files:
         raise FileNotFoundError(f"No MP4 file found in {output_dir} after download.")
