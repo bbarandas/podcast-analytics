@@ -25,26 +25,18 @@ cc-podcast-analytics  # abre nova sessão Claude neste projeto
 ## GitHub
 
 https://github.com/bbarandas/podcast-analytics (público)
-Streamlit Cloud: https://podcast-analytics-4memhp7rcmupqdwasfrgph.streamlit.app
+Hugging Face Spaces: https://huggingface.co/spaces/bbarandas/podcast-analytics
 
 ---
 
-## ⚠️ PENDENTE — Retomar aqui
+## Status do Deploy
 
-### Deploy Streamlit Cloud com erro libGL
+**Plataforma:** Hugging Face Spaces (Docker)
+**URL:** https://huggingface.co/spaces/bbarandas/podcast-analytics
+**Status:** ✅ Funcionando
 
-**Problema:** `ImportError: libGL.so.1` ao carregar páginas de Vídeo e Biomecânica.
-
-**Causa:** ultralytics instala opencv-python (full) que precisa de libGL. No Debian trixie do Streamlit Cloud, nenhum pacote apt resolve isso sem conflito de dependências.
-
-**Último fix aplicado (commit e775d37):** removeu todos os `import cv2` do nosso código — usa PIL + ffmpeg + numpy. Ultralytics pode ainda importar cv2 internamente. **Ainda não confirmado se funcionou** — Bruno foi dormir antes de ver o resultado.
-
-**Próximos passos:**
-1. Abrir o Streamlit Cloud e verificar se o último deploy passou
-2. Se ainda falhar → avaliar remover ultralytics do cloud e usar detecção alternativa
-3. O diferencial real é a biomecânica (MediaPipe) — o YOLO é secundário
-
-**O que já foi tentado e não funcionou:**
-- packages.txt com libgl1-mesa-glx, libglib2.0-0, libgl1-mesa-dri, libgl1
-- opencv-python-headless (ultralytics sobrescreve com full)
-- runtime.txt para Python 3.11 (funcionou para mediapipe, não para libGL)
+**Decisões tomadas:**
+- Migrado do Streamlit Cloud (libGL.so.1 irresolúvel no Debian trixie)
+- ultralytics removido do requirements.txt — YOLO é secundário ao MediaPipe
+- mediapipe fixado em 0.10.14 (mp.solutions removido em versões mais novas)
+- Dockerfile usa libgl1 + libglib2.0-0 + ffmpeg no Debian trixie
