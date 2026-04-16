@@ -7,23 +7,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
+from modules.biomechanics.pose import estimate_pose, calculate_angles, overlay_skeleton
+from visualizations.exporter import export_png
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
 st.set_page_config(page_title="Biomecânica", layout="wide")
 st.title("🦴 Biomecânica")
-
-try:
-    from modules.biomechanics.pose import estimate_pose, calculate_angles, overlay_skeleton
-    from visualizations.exporter import export_png
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-    _local_available = True
-except ImportError:
-    _local_available = False
-
-if not _local_available:
-    st.warning("⚠️ Esta funcionalidade está disponível apenas na versão local do dashboard.")
-    st.info("Para usar análise biomecânica, instale as dependências locais:\n```\npip install -r requirements-local.txt\n```\nE rode o dashboard com `podcast-dash`.")
-    st.stop()
 
 if "frames" not in st.session_state:
     st.info("Primeiro extraia frames na aba **Vídeo**.")

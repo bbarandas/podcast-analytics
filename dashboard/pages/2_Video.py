@@ -1,26 +1,17 @@
 import streamlit as st
 from pathlib import Path
 import sys
+import tempfile
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
+from modules.video.downloader import download, extract_frames
+from modules.video.detector import detect_players, annotate_frames
+
 st.set_page_config(page_title="Vídeo", layout="wide")
 st.title("🎥 Análise de Vídeo")
-
-try:
-    import tempfile
-    from modules.video.downloader import download, extract_frames
-    from modules.video.detector import detect_players, annotate_frames
-    _local_available = True
-except ImportError:
-    _local_available = False
-
-if not _local_available:
-    st.warning("⚠️ Esta funcionalidade está disponível apenas na versão local do dashboard.")
-    st.info("Para usar análise de vídeo, instale as dependências locais:\n```\npip install -r requirements-local.txt\n```\nE rode o dashboard com `podcast-dash`.")
-    st.stop()
 
 st.sidebar.header("Fonte de vídeo")
 source = st.sidebar.radio("Origem", ["Upload de arquivo", "URL do YouTube"])
