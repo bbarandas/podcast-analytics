@@ -5,6 +5,8 @@ import tempfile
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+
 from modules.video.downloader import download, extract_frames
 from modules.video.detector import detect_players, annotate_frames
 
@@ -26,7 +28,7 @@ else:
     url = st.sidebar.text_input("URL do YouTube")
     if st.sidebar.button("Baixar vídeo") and url:
         with st.spinner("Baixando..."):
-            dl_dir = Path("data/video_downloads")
+            dl_dir = PROJECT_ROOT / "data" / "video_downloads"
             video_path = download(url, dl_dir)
             st.session_state["video_path"] = str(video_path)
             st.success(f"Baixado: {video_path.name}")
@@ -47,13 +49,13 @@ end_sec = col2.number_input("Fim (segundos)", min_value=0.0, value=5.0, step=0.5
 
 if st.button("Extrair frames e detectar jogadores"):
     with st.spinner("Extraindo frames..."):
-        frames_dir = Path("data/frames") / video_path.stem
+        frames_dir = PROJECT_ROOT / "data" / "frames" / video_path.stem
         frames = extract_frames(video_path, start_sec, end_sec, frames_dir)
         st.success(f"{len(frames)} frames extraídos.")
 
     with st.spinner("Detectando jogadores (YOLO)..."):
         detections = detect_players(frames_dir)
-        annotated_dir = Path("data/annotated") / video_path.stem
+        annotated_dir = PROJECT_ROOT / "data" / "annotated" / video_path.stem
         annotated = annotate_frames(detections, annotated_dir)
         st.session_state["frames"] = [str(p) for p in frames]
         st.session_state["annotated"] = [str(p) for p in annotated]

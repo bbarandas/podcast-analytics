@@ -5,6 +5,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+
 from modules.biomechanics.pose import estimate_pose, calculate_angles, overlay_skeleton
 from visualizations.exporter import export_png
 import matplotlib
@@ -23,7 +25,7 @@ frame_paths = [Path(p) for p in st.session_state["frames"]]
 if st.button("Analisar pose (MediaPipe)"):
     with st.spinner("Estimando pose..."):
         pose_results = estimate_pose(frame_paths)
-        skeleton_dir = Path("data/skeleton") / frame_paths[0].parent.name
+        skeleton_dir = PROJECT_ROOT / "data" / "skeleton" / frame_paths[0].parent.name
         overlaid = overlay_skeleton(frame_paths, pose_results, skeleton_dir)
         angles_df = calculate_angles(pose_results)
         st.session_state["pose_results"] = pose_results
@@ -69,7 +71,11 @@ st.plotly_chart(fig, use_container_width=True)
 
 # --- Annotations ---
 st.subheader("Anotações de momentos-chave")
-annotation_text = st.text_area("Anotações (ex: frame 12 = momento do contato com a bola)")
+annotation_text = st.text_area(
+    "Anotações (ex: frame 12 = momento do contato com a bola)",
+    value=st.session_state.get("annotation", ""),
+)
+st.session_state["annotation"] = annotation_text
 if st.button("Exportar gráfico de ângulos como PNG"):
     mpl_fig, ax = plt.subplots(figsize=(12, 5), facecolor="#1a1a2e")
     ax.set_facecolor("#1a1a2e")

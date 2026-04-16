@@ -21,6 +21,8 @@ def download(url: str, output_dir: Path) -> Path:
         check=True,
     )
     mp4_files = sorted(output_dir.glob("*.mp4"), key=lambda p: p.stat().st_mtime)
+    if not mp4_files:
+        raise FileNotFoundError(f"No MP4 file found in {output_dir} after download.")
     return mp4_files[-1]
 
 

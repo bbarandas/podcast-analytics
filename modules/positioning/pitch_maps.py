@@ -1,5 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from mplsoccer import Pitch
 from visualizations.theme import (

@@ -17,8 +17,8 @@ def test_angle_180_degrees():
     assert abs(result - 180.0) < 0.01
 
 
-def test_angle_45_degrees():
-    # a=(1,0), b=(0,0), c=(0,1) → 90° at b
+def test_angle_orthogonal_vectors():
+    # a=(1,0), b=(0,0), c=(0,1) → 90° at b (orthogonal vectors)
     result = _angle([1, 0], [0, 0], [0, 1])
     assert abs(result - 90.0) < 0.01
 
