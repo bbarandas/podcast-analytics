@@ -8,4 +8,4 @@ numpy
 Pillow
 yt-dlp
 opencv-python-headless
-mediapipe
+mediapipe==0.10.14
